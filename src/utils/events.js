@@ -3,7 +3,7 @@ import { splitArray, updateJsonFile } from './utils.js'
 import { events } from './adminUtils/admin.js'
 
 const eventSubscribe = async (chatId, data, { chat }) => {
-	if (chat.id === chatId) {
+	if (chat.id === chatId || chat === -1) {
 		const updatingEvent = events.find(event => event.text === data)
 		if (!updatingEvent)
 			return
@@ -16,19 +16,22 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 }
 
 export const chooseEvent = async chatId => new Promise(() => {
-	if (events.length)
+	if (events.length === 1)
+		eventSubscribe(chatId, events[0].text, { chat: -1 })
+
+	else if (events.length) {
 		bot.sendMessage(
 			chatId,
 			'Выберите мероприятие',
 			{ reply_markup: { inline_keyboard: splitArray(events, 3) } }
 		)
+		bot.on('callback_query', async ({ data, message }) => await eventSubscribe(chatId, data, message))
+	}
 	else {
 		bot.sendMessage(chatId, 'Сейчас не запланировано никаких мероприятий')
 
 		return
 	}
-
-	bot.on('callback_query', async ({ data, message }) => await eventSubscribe(chatId, data, message))
 })
 
 export const getUserEvents = async ({ chat }) => {
