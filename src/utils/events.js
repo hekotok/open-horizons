@@ -18,7 +18,6 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 export const chooseEvent = async chatId => new Promise(() => {
 	if (events.length === 1)
 		eventSubscribe(chatId, events[0].text, { chat: -1 })
-
 	else if (events.length) {
 		bot.sendMessage(
 			chatId,

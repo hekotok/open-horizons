@@ -24,6 +24,12 @@ export const sortTime = timeArray => [ ...timeArray ].sort((time1, time2) => {
 	return hours1 === hours2 ? minutes1 - minutes2 : hours1 - hours2
 })
 
+const checkDate = date => {
+	const parts = date.split`.`
+
+	return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00.000Z`) <= new Date()
+}
+
 export const getDate = async chatId => {
 	let currDate = Date.now()
 	const ONE_MONTH = 2_592_000_000
@@ -37,7 +43,7 @@ export const getDate = async chatId => {
 			if (data.startsWith('clndr-date-')) {
 				const selectedDate = data.split`-`[2]
 
-				if (new Date(selectedDate) <= new Date())
+				if (checkDate(selectedDate))
 					await bot.sendMessage(chatId, 'Извините, но нельзя запланировать мероприятие на прошлое')
 				else {
 					await bot.deleteMessage(chatId, messageId)
