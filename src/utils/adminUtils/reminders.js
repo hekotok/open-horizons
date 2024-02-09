@@ -1,21 +1,32 @@
 import { bot } from '../../config.js'
-import { deleteEvent } from './admin.js'
+import { splitArray } from '../utils.js'
+import { adminIds, events } from './admin.js'
 
-const reminders = {}
-
-export const createReminders = ({ message, date, time, subs, text }) => {
-	const [ day, month, year ] = date.split`.`
-
-	reminders[text] = time.map((eventTime, scheduleIdx) => {
-		const [ hours, minutes ] = eventTime.split`:`
-		const reminderTime = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes)) - new Date()
-
-		if (reminderTime > 0)
-			return setTimeout(() => {
-				subs.forEach(async chatId => bot.copyMessage(chatId, message.fromId, message.id))
-				scheduleIdx === time.length - 1 && deleteEvent(text)
-			}, reminderTime)
-	})
+const createReminder = event => {
+	console.log(event)
 }
 
-export const deleteReminders = text => reminders[text] && reminders[text].forEach(reminder => clearTimeout(reminder))
+export const addReminder = async chat => {
+	if (!adminIds.includes(chat.id))
+		return await bot.sendMessage(chat.id, 'Извините, но эта команда доступна только администраторам бота')
+
+	await bot.sendMessage(
+		chat.id,
+		'Какое мероприятие вы хотите удалить',
+		{ reply_markup: {
+			inline_keyboard: events.length
+				? [ [ 'Напоминание для всех' ], ...splitArray(events, 3) ]
+				: [ [ 'Напоминание для всех' ] ]
+		} }
+	)
+
+	const handleChooseEvent = async ({ data }) => {
+		createReminder(data)
+
+		bot.off('callback_query', handleChooseEvent)
+	}
+
+	bot.on('callback_query', handleChooseEvent)
+}
+
+//export const deleteReminders = text => reminders[text] && reminders[text].forEach(reminder => clearTimeout(reminder))

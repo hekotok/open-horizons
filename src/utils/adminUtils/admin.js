@@ -4,7 +4,6 @@ import { bot } from '../../config.js'
 import { editEventName, editEventMessage, editEventDate, editEventTime } from './editEvents.js'
 import { getDate, getTime } from './time.js'
 import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
-import { deleteReminders, createReminders } from './reminders.js'
 
 export const adminIds = [ 484526571, 1242013874 ]
 export let events = []
@@ -35,16 +34,6 @@ export const addEvent = async ({ chat }) => {
 
 	text = text.trim()
 
-	let message = await getUserMessage(chat.id, false, {
-		question: 'Введите сообщение, которое будет напоминать пользователю о мероприятии',
-		cancelMessage: 'Добавление мероприятия отменено'
-	})
-
-	if (!message)
-		return
-
-	message = { id: message.message_id, fromId: message.from.id }
-
 	const date = await getDate(chat.id)
 	const time = await getTime(chat.id)
 
@@ -56,8 +45,7 @@ export const addEvent = async ({ chat }) => {
 
 	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date}\nНапоминания придут в:\n${time.join('\n')}`)
 
-	const newEvent = { text, message, date, callback_data: text, time, subs: [] }
-	createReminders(newEvent)
+	const newEvent = { text, date, callback_data: text, time, subs: [], reminders: [] }
 
 	events.push(newEvent)
 	updateJsonFile('events', events)
@@ -89,7 +77,6 @@ export const deleteEventCommand = async ({ chat }) => {
 		const deletingEventIdx = events.findIndex(event => event.text === data)
 
 		if (deletingEventIdx !== -1) {
-			deleteReminders(events[deletingEventIdx].text)
 			events.splice(deletingEventIdx, 1)
 			fs.writeFileSync('tempdb.json', JSON.stringify({ events }), 'utf-8')
 
