@@ -1,6 +1,7 @@
 import fs from 'fs'
 
 import { bot } from './config.js'
+import { addSub } from './utils/utils.js'
 import { chooseEvent, getUserEvents, getOtherEvents } from './utils/events.js'
 import { addReminder } from './utils/adminUtils/reminders.js'
 import {
@@ -30,6 +31,7 @@ const start = async ({ chat }) => {
 		]
 		: [ [ { text: 'Мои мероприятия' } ], [ { text: 'Подписаться на мероприятие' } ] ]
 
+	addSub(chat.id)
 	await bot.sendMessage( chat.id, helloText, { reply_markup: { keyboard: commands } })
 	await chooseEvent(chat.id)
 }

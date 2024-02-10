@@ -32,8 +32,15 @@ export const splitArray = (arr, subarraySize) => {
 }
 
 export const updateJsonFile = (property, value) => {
-	const existingData = JSON.parse(fs.readFileSync('tempdb.json', 'utf8') || {})
+	const data = JSON.parse(fs.readFileSync('tempdb.json', 'utf8'))
 
-	existingData[property] = value
-	fs.writeFileSync('tempdb.json', JSON.stringify(existingData, null, 2), 'utf8')
+	data[property] = value
+	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
+}
+
+export const addSub = chatId => {
+	const data = JSON.parse(fs.readFileSync('tempdb.json', 'utf8'))
+
+	!data.subs.includes(chatId) && data.subs.push(chatId)
+	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }

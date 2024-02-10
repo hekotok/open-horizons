@@ -1,15 +1,28 @@
+import fs from 'fs'
+
 import { bot } from '../../config.js'
 import { splitArray, getUserMessage } from '../utils.js'
 import { adminIds, events } from './admin.js'
-import { getDate, getTime } from './time.js'
+import { getDate, getTime, parseDateTime } from './time.js'
 
 const createReminder = async (chatId, eventName) => {
 	const msg = await getUserMessage(chatId, true, {
 		question: 'Введите текст напоминания. Так же добавьте файлы, видео или фото',
 		cancelMessage: 'Добавление мероприятия отменено'
 	})
-	const date = await getDate(chatId)
-	const time = await getTime(chatId)
+	const date = parseDateTime(await getDate(chatId, 'Когда отправить напоминание'), await getTime(chatId))
+
+	if (date <= new Date())
+		return await bot.sendMessage(chatId, 'Извините, но напоминание отменено. Купите DeLorean, чтобы отправиться в прошлое и отправить напоминание там')
+
+	if (eventName === 'all')
+		setTimeout(() => JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), date - new Date())
+	else {
+		const eventIdx = events.findIndex(event => event.text === eventName)
+
+		events[eventIdx].reminders[date] = setTimeout(() => events[eventIdx].subs
+			.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), date - new Date())
+	}
 }
 
 export const addReminder = async ({ chat }) => {

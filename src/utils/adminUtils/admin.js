@@ -2,7 +2,7 @@ import fs from 'fs'
 
 import { bot } from '../../config.js'
 import { editEventName, editEventMessage, editEventDate, editEventTime } from './editEvents.js'
-import { getDate, getTime } from './time.js'
+import { getDate, getTime, parseDateTime } from './time.js'
 import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
 
 export const adminIds = [ 484526571, 1242013874 ]
@@ -24,18 +24,17 @@ export const addEvent = async ({ chat }) => {
 	if (!adminIds.includes(chat.id))
 		return await bot.sendMessage(chat.id, 'Извините, но эта команда доступна только администраторам бота')
 
-	let text = (await getUserMessage(chat.id, true, {
+	let text = await getUserMessage(chat.id, true, {
 		question: 'Как называется ваше мероприятие',
 		cancelMessage: 'Добавление мероприятия отменено'
-	}))
+	})
 
 	if (!text)
 		return
-
 	text = text.trim()
 
 	const date = await getDate(chat.id)
-	const time = await getTime(chat.id)
+	const time = await getTime(chat.id, 'Введите время, в которое пройдет мероприятие\nНапример: 10:00')
 
 	if (!time || !time.length) {
 		await bot.sendMessage(chat.id, 'Что-то пошло не так, попробуйте еще раз добавить мероприятие')
@@ -43,11 +42,11 @@ export const addEvent = async ({ chat }) => {
 		return
 	}
 
-	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date}\nНапоминания придут в:\n${time.join('\n')}`)
+	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date} ${time}`)
 
-	const newEvent = { text, date, callback_data: text, time, subs: [], reminders: [] }
+	console.log(parseDateTime(date, time))
 
-	events.push(newEvent)
+	events.push({ text, date: parseDateTime(date, time), callback_data: name, subs: [], reminders: [] })
 	updateJsonFile('events', events)
 }
 
