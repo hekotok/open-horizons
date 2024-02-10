@@ -16,8 +16,6 @@ const sendMessage = () => {
 }
 
 const start = async ({ chat }) => {
-	bot.sendMessage(chat.id, 'dsaads', { schedule_date: Math.floor(Date.now()) + 600 })
-
 	const helloText = (JSON.parse(fs.readFileSync('tempdb.json', 'utf8')).helloText || 'Привет, {first_name}')
 		.replace(/{first_name}/g, chat.first_name || '')
 		.replace(/{last_name}/g, chat.last_name || '')
