@@ -1,5 +1,7 @@
 import { bot } from '../../config.js'
-import { getUserMessage } from '../utils.js'
+import { getUserMessage, splitArray } from '../utils.js'
+import { events } from './admin.js'
+import { createReminder, deleteReminder } from './reminders.js'
 import { getDate, getTime } from './time.js'
 
 export const editEventName = async chatId => {
@@ -13,15 +15,39 @@ export const editEventName = async chatId => {
 		return text.trim()
 }
 
-export const editEventMessage = async chatId => {
-	const message = await getUserMessage(chatId, false, {
-		question: 'Введите новое сообщение для напоминания о мероприятии',
-		cancelMessage: 'Изменение мероприятия отменено',
-		answer: 'Сообщение напоминания изменено'
-	})
+export const editReminders = async (chatId, eventIdx) => {
+	const reminders = splitArray(events[eventIdx].reminders.map(reminder => ({ text: reminder.date, callback_data: reminder.id })), 2)
 
-	if (message)
-		return { id: message.message_id, fromId: message.from.id }
+	bot.sendMessage(
+		chatId,
+		'Добавьте новое напоминание или удалите имеющееся',
+		{ reply_markup: { inline_keyboard: [ [ { text: 'Добавить новое напоминание', callback_data: 'add' } ], reminders ] } }
+	)
+
+	const handleChooseReminder = async ({ data }) => {
+		if (data === 'new')
+			createReminder(chatId, events[eventIdx].text)
+		else {
+			bot.sendMessage(
+				chatId,
+				'Желаете удалить это напоминание',
+				{ reply_markup: { inline_keyboard: [ [
+					{ text: 'Удалить напоминание', callback_data: 'del' },
+					{ text: 'Не изменять напоминание', callback_data: 'cancel' }
+				] ] } }
+			)
+
+			const handleEditReminder = async ({ data }) => {
+				data === 'del' && deleteReminder()
+				bot.off('callback_query', handleEditReminder)
+			}
+
+			bot.on('callback_query', handleEditReminder)
+		}
+		bot.off('callback_query', handleChooseReminder)
+	}
+
+	bot.on('callback_query', handleChooseReminder)
 }
 
 export const editEventDate = async (chatId, event) => {

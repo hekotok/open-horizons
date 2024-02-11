@@ -1,11 +1,11 @@
 import fs from 'fs'
 
 import { bot } from '../../config.js'
-import { splitArray, getUserMessage } from '../utils.js'
+import { splitArray, getUserMessage, updateJsonFile } from '../utils.js'
 import { adminIds, events } from './admin.js'
 import { getDate, getTime, parseDateTime } from './time.js'
 
-const createReminder = async (chatId, eventName) => {
+export const createReminder = async (chatId, eventName) => {
 	const msg = await getUserMessage(chatId, true, {
 		question: 'Введите текст напоминания. Так же добавьте файлы, видео или фото',
 		cancelMessage: 'Добавление мероприятия отменено'
@@ -31,6 +31,8 @@ const createReminder = async (chatId, eventName) => {
 			: 'участников мероприятия ' + eventName
 		}`
 	)
+
+	updateJsonFile('events', events)
 }
 
 export const addReminder = async ({ chat }) => {
@@ -52,4 +54,4 @@ export const addReminder = async ({ chat }) => {
 	bot.on('callback_query', handleChooseEvent)
 }
 
-//export const deleteReminders = text => reminders[text] && reminders[text].forEach(reminder => clearTimeout(reminder))
+export const deleteReminder = () => {}
