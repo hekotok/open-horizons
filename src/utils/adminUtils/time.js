@@ -16,7 +16,7 @@ const checkTime = time => {
 	return null
 }
 
-export const checkPastDate = (date, time = '00:00') => parseDateTime(date, time) <= new Date()
+export const checkPastDate = (date, time = '23:59') => parseDateTime(date, time) >= new Date()
 
 export const parseDateTime = (dateString, timeString) => {
 	const [ day, month, year ] = dateString.split`.`
@@ -38,7 +38,7 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 			if (data.startsWith('clndr-date-')) {
 				const selectedDate = data.split`-`[2]
 
-				if (checkPastDate(selectedDate))
+				if (!checkPastDate(selectedDate))
 					await bot.sendMessage(chatId, 'Извините, но нельзя запланировать мероприятие на прошлое')
 				else {
 					await bot.deleteMessage(chatId, messageId)

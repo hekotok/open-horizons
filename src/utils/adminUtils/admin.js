@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 import { bot } from '../../config.js'
-import { editEventName, editEventMessage, editEventDate, editEventTime } from './editEvents.js'
+import { editEventName, editReminders, editEventDate, editEventTime } from './editEvents.js'
 import { getDate, getTime, parseDateTime } from './time.js'
 import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
 
@@ -140,8 +140,14 @@ export const editEvent = async ({ chat }) => {
 
 		await bot.sendMessage( chat.id, 'Что вы хотите изменить', {
 			reply_markup: { inline_keyboard: [
-				[ { text: 'Название', callback_data: 'editname' }, { text: 'Содержание', callback_data: 'editmsg' } ],
-				[ { text: 'Дата', callback_data: 'editdate' }, { text: 'Время уведомлений', callback_data: 'edittime' } ]
+				[
+					{ text: 'Название', callback_data: 'editname' },
+					{ text: 'Редактировать напоминания', callback_data: 'editreminders' }
+				],
+				[
+					{ text: 'Дата', callback_data: 'editdate' },
+					{ text: 'Время уведомлений', callback_data: 'edittime' }
+				]
 			] }
 		})
 
@@ -150,8 +156,8 @@ export const editEvent = async ({ chat }) => {
 			case 'editname':
 				events[editingEventIdx].text = events[editingEventIdx].callback_data = await editEventName(chat.id) || events[editingEventIdx].text
 				break
-			case 'editmsg':
-				events[editingEventIdx].message = await editEventMessage(chat.id) || events[editingEventIdx].message
+			case 'editreminders':
+				events[editingEventIdx].message = await editReminders(chat.id, editingEventIdx) || events[editingEventIdx].message
 				break
 			case 'editdate':
 				events[editingEventIdx].date = await editEventDate(chat.id, events[editingEventIdx]) || events[editingEventIdx].date
