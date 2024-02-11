@@ -20,6 +20,35 @@ export const editHelloText = async ({ chat }) => {
 	updateJsonFile('helloText', helloText)
 }
 
+export const sendMessage = async ({ chat }) => {
+	if (!adminIds.includes(chat.id))
+		return await bot.sendMessage(chat.id, 'Извините, но эта команда доступна только администраторам бота')
+
+	await bot.sendMessage(
+		chat.id,
+		'Участникам какого мероприятия вы бы хотели отправить сообщение',
+		{ reply_markup: { inline_keyboard: [ [ { text: 'Напоминание для всех', callback_data: 'all' } ], ...splitArray(events, 3) ] } }
+	)
+
+	const handleMessage = async ({ data }) => {
+		const msg = await getUserMessage(chat.id, false, {
+			question: 'Введите сообщение, которое отправится пользователям',
+			answer: 'Сообщение отправлено',
+			cancelMessage: 'Отправка сообщения отменена'
+		})
+
+		if (data === 'all')
+			JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs.forEach(userId => bot.copyMessage(userId, chat.id, msg.message_id))
+		else
+			events.find(event => event.text === data).subs
+				.forEach(userId => bot.copyMessage(userId, chat.id, msg.message_id))
+
+		bot.off('callback_query', handleMessage)
+	}
+
+	bot.on('callback_query', handleMessage)
+}
+
 export const addEvent = async ({ chat }) => {
 	if (!adminIds.includes(chat.id))
 		return await bot.sendMessage(chat.id, 'Извините, но эта команда доступна только администраторам бота')
@@ -46,7 +75,7 @@ export const addEvent = async ({ chat }) => {
 
 	console.log(parseDateTime(date, time))
 
-	events.push({ text, date: parseDateTime(date, time), callback_data: name, subs: [], reminders: [] })
+	events.push({ text, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
 	updateJsonFile('events', events)
 }
 

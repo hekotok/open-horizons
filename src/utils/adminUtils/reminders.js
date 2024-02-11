@@ -6,7 +6,7 @@ import { adminIds, events } from './admin.js'
 import { getDate, getTime, parseDateTime } from './time.js'
 
 const createReminder = async (chatId, eventName) => {
-	const msg = await getUserMessage(chatId, true, {
+	const msg = await getUserMessage(chatId, false, {
 		question: 'Введите текст напоминания. Так же добавьте файлы, видео или фото',
 		cancelMessage: 'Добавление мероприятия отменено'
 	})
@@ -21,7 +21,7 @@ const createReminder = async (chatId, eventName) => {
 		const eventIdx = events.findIndex(event => event.text === eventName)
 
 		events[eventIdx].reminders[date] = setTimeout(() => events[eventIdx].subs
-			.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), date - new Date())
+			.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id)), date - new Date())
 	}
 }
 

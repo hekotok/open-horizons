@@ -10,11 +10,9 @@ import {
 	editEvent,
 	adminIds,
 	initEvents,
-	editHelloText
+	editHelloText,
+	sendMessage
 } from './utils/adminUtils/admin.js'
-
-const sendMessage = () => {
-}
 
 const start = async ({ chat }) => {
 	const helloText = (JSON.parse(fs.readFileSync('tempdb.json', 'utf8')).helloText || 'Привет, {first_name}')
@@ -24,7 +22,7 @@ const start = async ({ chat }) => {
 	const commands = adminIds.includes(chat.id)
 		? [
 			[ { text: 'Мои мероприятия' }, { text: 'Подписаться на мероприятие' } ],
-			[ { text: 'Редактировать приветствие' }, { text: 'Отправить пользователям сообщение' } ],
+			[ { text: 'Редактировать приветствие' }, { text: 'Отправить сообщение' } ],
 			[ { text: 'Добавить мероприятие' }, { text: 'Удалить мероприятие' } ],
 			[ { text: 'Редактировать мероприятие' } ],
 			[ { text: 'Добавить напоминание' } ]
