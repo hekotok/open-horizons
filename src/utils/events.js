@@ -35,7 +35,7 @@ export const chooseEvent = async chatId => new Promise(() => {
 
 export const getUserEvents = async ({ chat }) => {
 	const userEvents = events.filter(event => event.subs.includes(chat.id))
-		.map(event => `На ${event.date} запланировано ${event.text}`).join`\n`
+		.map(event => `На ${event.date.split`T`[0]} запланировано ${event.text}`).join`\n`
 
 	await bot.sendMessage(chat.id, userEvents.length ? userEvents : 'У вас нет запланированных мероприятий')
 }

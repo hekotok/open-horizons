@@ -23,6 +23,14 @@ const createReminder = async (chatId, eventName) => {
 		events[eventIdx].reminders[date] = setTimeout(() => events[eventIdx].subs
 			.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), date - new Date())
 	}
+
+	bot.sendMessage(
+		chatId,
+		`Запланировано напоминание для ${eventName === 'all'
+			? 'всех пользователей'
+			: 'участников мероприятия ' + eventName
+		}`
+	)
 }
 
 export const addReminder = async ({ chat }) => {
