@@ -12,19 +12,17 @@ export const createReminder = async (chatId, eventName) => {
 	})
 	const date = parseDateTime(await getDate(chatId, 'Когда отправить напоминание'), await getTime(chatId))
 
-	if (date <= new Date())
+	if (date - 10_800_000 < Date.now())
 		return await bot.sendMessage(chatId, 'Извините, но напоминание отменено. Купите DeLorean, чтобы отправиться в прошлое и отправить напоминание там')
 
 	if (eventName === 'all')
 		setTimeout(() => JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), date - new Date())
 	else {
 		const eventIdx = events.findIndex(event => event.text === eventName)
-		console.log(date - new Date() - 3_600_000)
-		events[eventIdx].reminders[date] = setTimeout(() => {
-			console.log(events[eventIdx].subs)
-			events[eventIdx].subs
-				.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id))
-		}, date - new Date() - 3_600_000)
+
+		events[eventIdx].reminders[date] = setTimeout(() => events[eventIdx].subs
+			.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id)),
+		date - Date.now() - 10_800_000)
 	}
 
 	bot.sendMessage(chatId, 'Напоминание создано')
