@@ -4,7 +4,9 @@
       "text": "fds",
       "date": "2024-02-21T10:00:00.000Z",
       "callback_data": "fds",
-      "subs": [],
+      "subs": [
+        484526571
+      ],
       "reminders": []
     }
   ],
