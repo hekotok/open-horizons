@@ -16,7 +16,9 @@ const checkTime = time => {
 	return null
 }
 
-export const checkPastDate = (date, time = '23:59') => parseDateTime(date, time) - 10_800_000 >= Date.now()
+export const delayDate = date => date - Date.now() - 10_800_000
+
+export const checkPastDate = (date, time = '23:59') => delayDate(parseDateTime(date, time)) > 0
 
 export const parseDateTime = (dateString, timeString) => {
 	const [ day, month, year ] = dateString.split`.`

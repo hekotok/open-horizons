@@ -3,9 +3,9 @@ import fs from 'fs'
 import { bot } from '../config.js'
 
 export const getUserMessage = async (chatId, needOnlyText, { question, answer, cancelMessage }) => new Promise(resolve => {
-	const listener = async msg => {
+	const handleUserMessage = async msg => {
 		if (msg.chat.id === chatId) {
-			bot.off('message', listener)
+			bot.off('message', handleUserMessage)
 
 			if (msg.text === '/cancel') {
 				cancelMessage && await bot.sendMessage(chatId, cancelMessage)
@@ -19,7 +19,7 @@ export const getUserMessage = async (chatId, needOnlyText, { question, answer, c
 	}
 
 	bot.sendMessage(chatId, question)
-	bot.on('message', listener)
+	bot.on('message', handleUserMessage)
 })
 
 export const splitArray = (arr, subarraySize) => {

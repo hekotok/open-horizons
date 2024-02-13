@@ -33,7 +33,7 @@ export const sendMessage = async ({ chat }) => {
 	const handleMessage = async ({ data }) => {
 		const msg = await getUserMessage(chat.id, false, {
 			question: 'Введите сообщение, которое отправится пользователям',
-			answer: 'Сообщение отправлено',
+			answer: 'Сообщение отправляется',
 			cancelMessage: 'Отправка сообщения отменена'
 		})
 
@@ -42,6 +42,8 @@ export const sendMessage = async ({ chat }) => {
 		else
 			events.find(event => event.text === data).subs
 				.forEach(userId => bot.copyMessage(userId, chat.id, msg.message_id))
+
+		await bot.sendMessage(chat.id, 'Сообщение отправлено')
 
 		bot.off('callback_query', handleMessage)
 	}
