@@ -60,7 +60,7 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 	})
 }
 
-export const getTime = async (chatId, question = 'Введите время, в которое вы хотели бы отправлять уведомление\nНапример:\n10:00') => {
+export const getTime = async (chatId, question = 'Введите время, в которое вы хотели бы отправлять уведомление\nНапример: 10:00') => {
 	let time
 
 	time = (await getUserMessage(chatId, true, { question, cancelMessage: 'Добавление мероприятия отменено' })).replace(/\s/g, '')

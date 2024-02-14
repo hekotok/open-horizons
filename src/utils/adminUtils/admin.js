@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 import { bot } from '../../config.js'
-import { editEventName, editReminders, editEventDate, editEventTime } from './editEvents.js'
+import { editEventName, editReminders, editEventDate } from './editEvents.js'
 import { getDate, getTime, parseDateTime } from './time.js'
 import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
 
@@ -75,8 +75,6 @@ export const addEvent = async ({ chat }) => {
 
 	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date} ${time}`)
 
-	console.log(parseDateTime(date, time))
-
 	events.push({ text, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
 	updateJsonFile('events', events)
 }
@@ -142,14 +140,9 @@ export const editEvent = async ({ chat }) => {
 
 		await bot.sendMessage( chat.id, 'Что вы хотите изменить', {
 			reply_markup: { inline_keyboard: [
-				[
-					{ text: 'Название', callback_data: 'editname' },
-					{ text: 'Редактировать напоминания', callback_data: 'editreminders' }
-				],
-				[
-					{ text: 'Дата', callback_data: 'editdate' },
-					{ text: 'Время уведомлений', callback_data: 'edittime' }
-				]
+				[ { text: 'Название', callback_data: 'editname' } ],
+				[ { text: 'Редактировать напоминания', callback_data: 'editreminders' } ],
+				[ { text: 'Дата мероприятия', callback_data: 'editdate' } ]
 			] }
 		})
 
@@ -163,9 +156,6 @@ export const editEvent = async ({ chat }) => {
 				break
 			case 'editdate':
 				events[editingEventIdx].date = await editEventDate(chat.id, events[editingEventIdx]) || events[editingEventIdx].date
-				break
-			case 'edittime':
-				events[editingEventIdx].time = await editEventTime(chat.id, events[editingEventIdx]) || events[editingEventIdx].time
 				break
 			}
 

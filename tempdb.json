@@ -1,16 +1,1 @@
-{
-  "events": [
-    {
-      "text": "fds",
-      "date": "2024-02-21T10:00:00.000Z",
-      "callback_data": "fds",
-      "subs": [
-        484526571
-      ],
-      "reminders": []
-    }
-  ],
-  "subs": [
-    484526571
-  ]
-}
+{"events":[{"text":"fds","date":"2024-02-21T10:00:00.000Z","callback_data":"fds","subs":[484526571],"reminders":[{"date":"2024-02-22T10:00:00.000Z","id":679169399}]},{"text":"Гущщв","date":"2024-02-22T10:00:00.000Z","callback_data":"Гущщв","subs":[],"reminders":[{"date":"2024-02-22T10:00:00.000Z","callback_data":680141659}]}]}

@@ -1,6 +1,7 @@
 import { bot } from '../config.js'
 import { splitArray, updateJsonFile } from './utils.js'
 import { events } from './adminUtils/admin.js'
+import { delayDate } from './adminUtils/time.js'
 
 const eventSubscribe = async (chatId, data, { chat }) => {
 	if (chat.id === chatId || chat === -1) {
@@ -34,7 +35,8 @@ export const chooseEvent = async chatId => new Promise(() => {
 })
 
 export const getUserEvents = async ({ chat }) => {
-	const userEvents = events.filter(event => event.subs.includes(chat.id))
+	const userEvents = events
+		.filter(event => event.subs.includes(chat.id) && delayDate(new Date(event.date)) >= 0)
 		.map(event => `На ${event.date.split`T`[0]} запланировано ${event.text}`).join`\n`
 
 	await bot.sendMessage(chat.id, userEvents.length ? userEvents : 'У вас нет запланированных мероприятий')
@@ -54,5 +56,6 @@ export const getOtherEvents = async ({ chat }) => {
 		'Выберите мероприятие, на которое вы хотели бы подписаться',
 		{ reply_markup: { inline_keyboard: splitArray(otherEvents, 3) } }
 	)
+
 	bot.on('callback_query', async ({ data, message }) => await eventSubscribe(chat.id, data, message))
 }

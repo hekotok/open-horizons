@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 import { bot } from '../../config.js'
-import { splitArray, getUserMessage } from '../utils.js'
+import { splitArray, getUserMessage, updateJsonFile } from '../utils.js'
 import { adminIds, events } from './admin.js'
 import { getDate, getTime, parseDateTime, delayDate } from './time.js'
 
@@ -21,12 +21,16 @@ export const createReminder = async (chatId, eventName) => {
 	else {
 		const eventIdx = events.findIndex(event => event.text === eventName)
 
-		events[eventIdx].reminders[date] = setTimeout(() => events[eventIdx].subs
-			.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id)),
-		delayDate(date))
+		events[eventIdx].reminders.push({
+			date,
+			id: setTimeout(() => events[eventIdx].subs
+				.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id)),
+			delayDate(date))._idleTimeout
+		})
 	}
 
-	bot.sendMessage(chatId, 'Напоминание создано')
+	updateJsonFile('events', events)
+	await bot.sendMessage(chatId, 'Напоминание создано')
 }
 
 export const addReminder = async ({ chat }) => {
@@ -48,4 +52,4 @@ export const addReminder = async ({ chat }) => {
 	bot.on('callback_query', handleChooseEvent)
 }
 
-export const deleteReminder = (eventIdx, reminderDate) => clearTimeout(events[eventIdx].reminders[reminderDate])
+export const deleteReminder = (eventIdx, reminderDate) => clearTimeout()
