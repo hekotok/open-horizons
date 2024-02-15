@@ -52,4 +52,9 @@ export const addReminder = async ({ chat }) => {
 	bot.on('callback_query', handleChooseEvent)
 }
 
-export const deleteReminder = (eventIdx, reminderDate) => clearTimeout()
+export const deleteReminder = (eventIdx, reminderId) => {
+	events[eventIdx].reminders = events[eventIdx].reminders.filter(reminder => reminder.id !== reminderId)
+
+	updateJsonFile('events', events)
+	clearTimeout(reminderId)
+}

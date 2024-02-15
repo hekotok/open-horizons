@@ -19,13 +19,20 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 export const chooseEvent = async chatId => new Promise(() => {
 	if (events.length === 1)
 		eventSubscribe(chatId, events[0].text, { chat: -1 })
-	else if (events.length) {
-		bot.sendMessage(
+	else if (events.length > 1) {
+		const { message_id } = bot.sendMessage(
 			chatId,
 			'Выберите мероприятие',
 			{ reply_markup: { inline_keyboard: splitArray(events, 3) } }
 		)
-		bot.on('callback_query', async ({ data, message }) => await eventSubscribe(chatId, data, message))
+
+		const handleCallbackQuery = async ({ data, message }) => {
+			await bot.deleteMessage(chatId, message_id)
+
+			eventSubscribe(chatId, data, message)
+			bot.off('callback_query', handleCallbackQuery)
+		}
+		bot.on('callback_query', handleCallbackQuery)
 	}
 	else {
 		bot.sendMessage(chatId, 'Сейчас не запланировано никаких мероприятий')
@@ -51,11 +58,17 @@ export const getOtherEvents = async ({ chat }) => {
 	if (!otherEvents.length)
 		return await bot.sendMessage(chat.id, 'Вы уже подписаны на все возможные мероприятия')
 
-	await bot.sendMessage(
+	const { message_id } = await bot.sendMessage(
 		chat.id,
 		'Выберите мероприятие, на которое вы хотели бы подписаться',
 		{ reply_markup: { inline_keyboard: splitArray(otherEvents, 3) } }
 	)
 
-	bot.on('callback_query', async ({ data, message }) => await eventSubscribe(chat.id, data, message))
+	const handleCallbackQuery = async ({ data, message }) => {
+		await bot.deleteMessage(chat.id, message_id)
+
+		eventSubscribe(chat.id, data, message)
+		bot.off('callback_query', handleCallbackQuery)
+	}
+	bot.on('callback_query', handleCallbackQuery)
 }

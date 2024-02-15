@@ -17,7 +17,7 @@ export const editEventName = async chatId => {
 
 export const editReminders = async (chatId, eventIdx) => {
 	const reminders = splitArray(events[eventIdx].reminders.map(reminder => ({
-		text: reminder.date.split`T`.join` `.replace(':00.000Z', ''),
+		text: reminder.date.toISOString().split`T`.join` `.replace(':00.000Z', ''),
 		callback_data: reminder.id
 	})), 2)
 
@@ -34,7 +34,8 @@ export const editReminders = async (chatId, eventIdx) => {
 			if (data === 'new')
 				createReminder(chatId, events[eventIdx].text)
 			else {
-				const msgDelReminder = await bot.sendMessage(
+				const reminderId = data
+				const { message_id } = await bot.sendMessage(
 					chatId,
 					'Желаете удалить это напоминание?',
 					{ reply_markup: { inline_keyboard: [
@@ -44,9 +45,9 @@ export const editReminders = async (chatId, eventIdx) => {
 				)
 
 				const handleEditReminder = async ({ data }) => {
-					data === 'del' && deleteReminder(data)
+					data === 'del' && deleteReminder(eventIdx, +reminderId)
 
-					bot.deleteMessage(chatId, msgDelReminder.message_id)
+					bot.deleteMessage(chatId, message_id)
 					bot.off('callback_query', handleEditReminder)
 				}
 

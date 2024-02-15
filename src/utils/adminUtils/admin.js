@@ -2,7 +2,7 @@ import fs from 'fs'
 
 import { bot } from '../../config.js'
 import { editEventName, editReminders, editEventDate } from './editEvents.js'
-import { getDate, getTime, parseDateTime } from './time.js'
+import { delayDate, getDate, getTime, parseDateTime } from './time.js'
 import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
 
 export const adminIds = [ 484526571, 1242013874 ]
@@ -27,7 +27,7 @@ export const sendMessage = async ({ chat }) => {
 	await bot.sendMessage(
 		chat.id,
 		'Участникам какого мероприятия вы бы хотели отправить сообщение',
-		{ reply_markup: { inline_keyboard: [ [ { text: 'Напоминание для всех', callback_data: 'all' } ], ...splitArray(events, 3) ] } }
+		{ reply_markup: { inline_keyboard: [ [ { text: 'Сообщение для всех', callback_data: 'all' } ], ...splitArray(events, 3) ] } }
 	)
 
 	const handleMessage = async ({ data }) => {
@@ -76,6 +76,8 @@ export const addEvent = async ({ chat }) => {
 	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date} ${time}`)
 
 	events.push({ text, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
+	setTimeout(() => events.at(-1).subs = [], delayDate(events.at(-1).date))
+
 	updateJsonFile('events', events)
 }
 

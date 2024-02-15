@@ -41,6 +41,8 @@ export const updateJsonFile = (property, value) => {
 export const addSub = chatId => {
 	const data = JSON.parse(fs.readFileSync('tempdb.json', 'utf8'))
 
+	!data.subs && (data.subs = [ chatId ])
 	!data.subs.includes(chatId) && data.subs.push(chatId)
+
 	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }
