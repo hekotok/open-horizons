@@ -21,6 +21,9 @@ export const createReminder = async (chatId, eventName) => {
 	else {
 		const eventIdx = events.findIndex(event => event.text === eventName)
 
+		events[eventIdx].date < date &&
+			await bot.sendMessage(chatId, 'Учтите, что напоминание отправится после окончания мероприятия')
+
 		events[eventIdx].reminders.push({
 			date,
 			id: setTimeout(() => events[eventIdx].subs

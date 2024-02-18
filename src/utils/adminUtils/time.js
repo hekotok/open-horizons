@@ -35,15 +35,13 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 
 	return new Promise(resolve => {
 		const handleCallbackQuery = async ({ message, data }) => {
-			const messageId = message.message_id
-
 			if (data.startsWith('clndr-date-')) {
 				const selectedDate = data.split`-`[2]
 
 				if (!checkPastDate(selectedDate))
 					await bot.sendMessage(chatId, 'Извините, но нельзя запланировать мероприятие на прошлое')
 				else {
-					await bot.deleteMessage(chatId, messageId)
+					await bot.deleteMessage(chatId, message.message_id)
 					bot.off('callback_query', handleCallbackQuery)
 
 					resolve(selectedDate)
@@ -52,7 +50,7 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 
 			(data.startsWith('clndr-nxtMnth') || data.startsWith('clndr-prvMnth')) && await bot.editMessageReplyMarkup(
 				Calendar.getUI(currDate += (data.startsWith('clndr-nxtMnth-') ? ONE_MONTH : -ONE_MONTH)),
-				{ chat_id: chatId, message_id: messageId }
+				{ chat_id: chatId, message_id: message.message_id }
 			)
 		}
 

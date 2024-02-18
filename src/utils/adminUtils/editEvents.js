@@ -5,14 +5,11 @@ import { createReminder, deleteReminder } from './reminders.js'
 import { getDate, getTime, parseDateTime } from './time.js'
 
 export const editEventName = async chatId => {
-	const text = await getUserMessage(chatId, true, {
+	return await getUserMessage(chatId, true, {
 		question: 'Введите новое название мероприятия',
 		cancelMessage: 'Изменение мероприятия отменено',
 		answer: 'Имя мероприятия изменено'
-	})
-
-	if (text)
-		return text.trim()
+	}) || null
 }
 
 export const editReminders = async (chatId, eventIdx) => {
@@ -61,25 +58,16 @@ export const editReminders = async (chatId, eventIdx) => {
 }
 
 export const editEventDate = async (chatId, event) => {
-	const date = await getDate(chatId)
+	const [ date, time ] = [ await getDate(chatId), await getTime(chatId) ]
 
-	if (!event.date) {
+	if (!date || !time) {
 		bot.sendMessage(chatId, 'Извините,что-то пошло не так, дата не изменена')
 
 		return
 	}
 
-	const time = await getTime(chatId)
-
-	if (!event.time) {
-		bot.sendMessage(chatId, 'Извините,что-то пошло не так, время уведомлений не задано')
-
-		return
-	}
-
-	bot.sendMessage(chatId, 'Время уведомлений изменено')
-
 	event.date = parseDateTime(date, time)
+	await bot.sendMessage(chatId, 'Время уведомлений изменено')
 
 	return event.date
 }

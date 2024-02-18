@@ -86,7 +86,7 @@ export const deleteEvent = text => {
 
 	if (deletingEventIdx !== -1) {
 		events.splice(deletingEventIdx, 1)
-		fs.writeFileSync('tempdb.json', JSON.stringify({ events }), 'utf-8')
+		updateJsonFile('events', events)
 	}
 }
 
@@ -108,7 +108,7 @@ export const deleteEventCommand = async ({ chat }) => {
 
 		if (deletingEventIdx !== -1) {
 			events.splice(deletingEventIdx, 1)
-			fs.writeFileSync('tempdb.json', JSON.stringify({ events }), 'utf-8')
+			updateJsonFile('events', events)
 
 			await bot.sendMessage(chat.id, `Мероприятие ${data} удалено`)
 		}
@@ -132,7 +132,13 @@ export const editEvent = async ({ chat }) => {
 	else
 		return await bot.sendMessage(chat.id, 'Cейчас не запланировано никаких мероприятий')
 
-	const handleEditingEvent = async ({ data }) => {
+	const handleEditingEvent = async ({ data, message }) => {
+		if (message.chat.id !== chat.id) {
+			bot.off('callback_query', handleEditingEvent)
+
+			return
+		}
+
 		const editingEventIdx = events.findIndex(event => event.text === data)
 		if (editingEventIdx === -1) {
 			await bot.sendMessage(chat.id, `Мероприятие ${data} не найдено`)
@@ -148,20 +154,22 @@ export const editEvent = async ({ chat }) => {
 			] }
 		})
 
-		const handleEditType = async ({ data }) => {
-			switch (data) {
-			case 'editname':
-				events[editingEventIdx].text = events[editingEventIdx].callback_data = await editEventName(chat.id) || events[editingEventIdx].text
-				break
-			case 'editreminders':
-				events[editingEventIdx].message = await editReminders(chat.id, editingEventIdx) || events[editingEventIdx].message
-				break
-			case 'editdate':
-				events[editingEventIdx].date = await editEventDate(chat.id, events[editingEventIdx]) || events[editingEventIdx].date
-				break
-			}
+		const handleEditType = async ({ data, message }) => {
+			if (message.chat.id === chat.id) {
+				switch (data) {
+				case 'editname':
+					events[editingEventIdx].text = events[editingEventIdx].callback_data = await editEventName(chat.id) || events[editingEventIdx].text
+					break
+				case 'editreminders':
+					events[editingEventIdx].message = await editReminders(chat.id, editingEventIdx) || events[editingEventIdx].message
+					break
+				case 'editdate':
+					events[editingEventIdx].date = await editEventDate(chat.id, events[editingEventIdx]) || events[editingEventIdx].date
+					break
+				}
 
-			fs.writeFileSync('tempdb.json', JSON.stringify({ events }), 'utf-8')
+				updateJsonFile('events', events)
+			}
 			bot.off('callback_query', handleEditType)
 		}
 
