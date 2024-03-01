@@ -73,7 +73,7 @@ export const addEvent = async ({ chat }) => {
 		return
 	}
 
-	await bot.sendMessage(chat.id, `Мероприятие запланировано на ${date} ${time}`)
+	await bot.sendMessage(chat.id, `Мероприятие ${text} запланировано на ${date} ${time}`)
 
 	events.push({ text, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
 	setTimeout(() => events.at(-1).subs = [], delayDate(events.at(-1).date))

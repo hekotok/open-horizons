@@ -30,7 +30,8 @@ const start = async ({ chat }) => {
 		: [ [ { text: 'Мои мероприятия' } ], [ { text: 'Подписаться на мероприятие' } ] ]
 
 	addSub(chat.id)
-	await bot.sendMessage( chat.id, helloText, { reply_markup: { keyboard: commands, resize_keyboard: true, keyboard_color: '#FF0000' } })
+
+	await bot.sendMessage( chat.id, helloText, { reply_markup: { keyboard: commands } })
 	await chooseEvent(chat.id)
 }
 
