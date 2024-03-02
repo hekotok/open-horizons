@@ -41,7 +41,10 @@ export const editReminders = async (chatId, eventIdx) => {
 					] } }
 				)
 
-				const handleEditReminder = async ({ data }) => {
+				const handleEditReminder = async ({ data, message }) => {
+					if (message.chat.id !== chatId)
+						return
+
 					data === 'del' && deleteReminder(eventIdx, +reminderId)
 
 					bot.deleteMessage(chatId, message_id)

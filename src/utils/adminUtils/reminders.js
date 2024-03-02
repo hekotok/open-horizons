@@ -46,9 +46,11 @@ export const addReminder = async ({ chat }) => {
 		{ reply_markup: { inline_keyboard: [ [ { text: 'Напоминание для всех', callback_data: 'all' } ], ...splitArray(events, 3) ] } }
 	)
 
-	const handleChooseEvent = async ({ data }) => {
-		createReminder(chat.id, data)
+	const handleChooseEvent = async ({ data, message }) => {
+		if (message.chat.id !== chat.id)
+			return
 
+		createReminder(chat.id, data)
 		bot.off('callback_query', handleChooseEvent)
 	}
 

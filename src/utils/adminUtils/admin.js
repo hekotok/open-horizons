@@ -30,7 +30,10 @@ export const sendMessage = async ({ chat }) => {
 		{ reply_markup: { inline_keyboard: [ [ { text: 'Сообщение для всех', callback_data: 'all' } ], ...splitArray(events, 3) ] } }
 	)
 
-	const handleMessage = async ({ data }) => {
+	const handleMessage = async ({ message, data }) => {
+		if (message.chat.id !== chat.id)
+			return
+
 		const msg = await getUserMessage(chat.id, false, {
 			question: 'Введите сообщение, которое отправится пользователям',
 			answer: 'Сообщение отправляется',
@@ -103,7 +106,10 @@ export const deleteEventCommand = async ({ chat }) => {
 	else
 		return await bot.sendMessage(chat.id, 'Cейчас не запланировано никаких мероприятий')
 
-	const handleCallbackQuery = async ({ data }) => {
+	const handleCallbackQuery = async ({ data, message }) => {
+		if (message.chat.id !== chat.id)
+			return
+
 		const deletingEventIdx = events.findIndex(event => event.text === data)
 
 		if (deletingEventIdx !== -1) {
@@ -112,7 +118,6 @@ export const deleteEventCommand = async ({ chat }) => {
 
 			await bot.sendMessage(chat.id, `Мероприятие ${data} удалено`)
 		}
-
 		bot.off('callback_query', handleCallbackQuery)
 	}
 
@@ -133,11 +138,8 @@ export const editEvent = async ({ chat }) => {
 		return await bot.sendMessage(chat.id, 'Cейчас не запланировано никаких мероприятий')
 
 	const handleEditingEvent = async ({ data, message }) => {
-		if (message.chat.id !== chat.id) {
-			bot.off('callback_query', handleEditingEvent)
-
+		if (message.chat.id !== chat.id)
 			return
-		}
 
 		const editingEventIdx = events.findIndex(event => event.text === data)
 		if (editingEventIdx === -1) {
@@ -169,8 +171,8 @@ export const editEvent = async ({ chat }) => {
 				}
 
 				updateJsonFile('events', events)
+				bot.off('callback_query', handleEditType)
 			}
-			bot.off('callback_query', handleEditType)
 		}
 
 		bot.off('callback_query', handleEditingEvent)

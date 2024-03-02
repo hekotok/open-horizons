@@ -35,6 +35,9 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 
 	return new Promise(resolve => {
 		const handleCallbackQuery = async ({ message, data }) => {
+			if (message.chat.id !== chatId)
+				return
+
 			if (data.startsWith('clndr-date-')) {
 				const selectedDate = data.split`-`[2]
 

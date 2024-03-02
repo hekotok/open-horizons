@@ -1,5 +1,13 @@
 {
-  "events": [],
+  "events": [
+    {
+      "text": "kjjkkkk",
+      "date": "2024-03-06T10:00:00.000Z",
+      "callback_data": "kjjkkkk",
+      "subs": [],
+      "reminders": []
+    }
+  ],
   "subs": [
     484526571,
     249185126,
