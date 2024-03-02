@@ -59,9 +59,7 @@ export const getDate = async (chatId, question = 'Когда пройдет ва
 }
 
 export const getTime = async (chatId, question = 'Введите время, в которое вы хотели бы отправлять уведомление\nНапример: 10:00') => {
-	let time
-
-	time = (await getUserMessage(chatId, true, { question, cancelMessage: 'Добавление мероприятия отменено' })).replace(/\s/g, '')
+	let time = (await getUserMessage(chatId, true, { question, cancelMessage: 'Добавление мероприятия отменено' })).replace(/\s/g, '')
 	question = checkTime(time)
 
 	return question ? getTime(chatId, question) : time

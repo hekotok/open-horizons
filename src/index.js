@@ -19,19 +19,21 @@ const start = async ({ chat }) => {
 		.replace(/{first_name}/g, chat.first_name || '')
 		.replace(/{last_name}/g, chat.last_name || '')
 
-	const commands = adminIds.includes(chat.id)
-		? [
-			[ { text: 'Мои мероприятия' }, { text: 'Подписаться на мероприятие' } ],
-			[ { text: 'Редактировать приветствие' }, { text: 'Отправить сообщение' } ],
-			[ { text: 'Добавить мероприятие' }, { text: 'Удалить мероприятие' } ],
-			[ { text: 'Редактировать мероприятие' } ],
-			[ { text: 'Добавить напоминание' } ]
-		]
-		: [ [ { text: 'Мои мероприятия' } ], [ { text: 'Подписаться на мероприятие' } ] ]
+	const adminCommands = [
+		[ { text: 'Редактировать приветствие' }, { text: 'Отправить сообщение' } ],
+		[ { text: 'Добавить мероприятие' }, { text: 'Удалить мероприятие' } ],
+		[ { text: 'Редактировать мероприятие' } ],
+		[ { text: 'Добавить напоминание' } ]
+	]
+
+	bot.setMyCommands([
+		{ command: 'myevents', description: 'Мои мероприятия' },
+		{ command: 'subscribe', description: 'Подписаться на новое мероприятие' }
+	])
 
 	addSub(chat.id)
 
-	await bot.sendMessage( chat.id, helloText, { reply_markup: { keyboard: commands } })
+	await bot.sendMessage(chat.id, helloText, adminIds.includes(chat.id) ? { reply_markup: { keyboard: adminCommands } } : {})
 	await chooseEvent(chat.id)
 }
 
@@ -40,8 +42,8 @@ const init = () => {
 
 	bot.onText(/\/start/, start)
 
-	bot.onText(/Мои мероприятия/, getUserEvents)
-	bot.onText(/Подписаться на мероприятие/, getOtherEvents)
+	bot.onText(/\/myevents/, getUserEvents)
+	bot.onText(/\/subscribe/, getOtherEvents)
 
 	bot.onText(/Редактировать приветствие/, editHelloText)
 	bot.onText(/Отправить сообщение/, sendMessage)
