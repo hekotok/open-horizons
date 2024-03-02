@@ -1,21 +1,30 @@
 {
   "events": [
     {
-      "text": "kjjkkkk",
-      "date": "2024-03-06T10:00:00.000Z",
-      "callback_data": "kjjkkkk",
+      "text": "h",
+      "date": "2024-03-29T10:00:00.000Z",
+      "callback_data": "h",
       "subs": [
         484526571
       ],
-      "reminders": []
+      "reminders": [
+        {
+          "date": "2024-03-02T18:28:00.000Z",
+          "id": 27301
+        },
+        {
+          "date": "2024-03-02T18:34:00.000Z",
+          "id": 36970
+        }
+      ]
     }
   ],
   "subs": [
-    484526571,
-    249185126,
-    759055434,
-    1451006514,
-    1242013874
+    {
+      "id": 484526571,
+      "first_name": "Daniil",
+      "last_name": "Zheleznyakov"
+    }
   ],
   "helloText": "Добавить мероприятие"
 }

@@ -1,9 +1,15 @@
 import fs from 'fs'
 
 import { bot } from '../../config.js'
-import { splitArray, getUserMessage, updateJsonFile } from '../utils.js'
 import { adminIds, events } from './admin.js'
 import { getDate, getTime, parseDateTime, delayDate } from './time.js'
+import {
+	splitArray,
+	isMedia,
+	sendNameMessage,
+	getUserMessage,
+	updateJsonFile
+} from '../utils.js'
 
 export const createReminder = async (chatId, eventName) => {
 	const msg = await getUserMessage(chatId, false, {
@@ -15,9 +21,16 @@ export const createReminder = async (chatId, eventName) => {
 	if (date - 10_800_000 < Date.now())
 		return await bot.sendMessage(chatId, 'Извините, но напоминание отменено. Купите DeLorean, чтобы отправиться в прошлое и отправить напоминание там')
 
+	const { subs } = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8'))
+
 	if (eventName === 'all')
-		setTimeout(() => JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs
-			.forEach(userId => bot.copyMessage(userId, chatId, msg.id)), delayDate(date))
+		setTimeout(() => subs
+			.forEach(user => {
+				if (isMedia(msg))
+					bot.copyMessage(user.id, chatId, msg.id)
+				else
+					sendNameMessage(user, msg.text)
+			}), delayDate(date))
 	else {
 		const eventIdx = events.findIndex(event => event.text === eventName)
 
@@ -27,7 +40,12 @@ export const createReminder = async (chatId, eventName) => {
 		events[eventIdx].reminders.push({
 			date,
 			id: setTimeout(() => events[eventIdx].subs
-				.forEach(userId => bot.copyMessage(userId, chatId, msg.message_id)),
+				.forEach(userId => {
+					if (isMedia(msg))
+						bot.copyMessage(userId, chatId, msg.message_id)
+					else
+						sendNameMessage(subs.find(user => user.id === userId), msg.text)
+				}),
 			delayDate(date))._idleTimeout
 		})
 	}

@@ -14,7 +14,7 @@ import {
 	sendMessage
 } from './utils/adminUtils/admin.js'
 
-const start = async ({ chat }) => {
+const start = async ({ chat, from: user }) => {
 	const helloText = (JSON.parse(fs.readFileSync('tempdb.json', 'utf8')).helloText || 'Привет, {first_name}')
 		.replace(/{first_name}/g, chat.first_name || '')
 		.replace(/{last_name}/g, chat.last_name || '')
@@ -31,7 +31,7 @@ const start = async ({ chat }) => {
 		{ command: 'subscribe', description: 'Подписаться на новое мероприятие' }
 	])
 
-	addSub(chat.id)
+	addSub(user)
 
 	await bot.sendMessage(chat.id, helloText, adminIds.includes(chat.id) ? { reply_markup: { keyboard: adminCommands } } : {})
 	await chooseEvent(chat.id)

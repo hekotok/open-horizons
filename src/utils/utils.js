@@ -22,12 +22,12 @@ export const getUserMessage = async (chatId, needOnlyText, { question, answer, c
 	bot.on('message', handleUserMessage)
 })
 
-export const sendNameMessage = async (chatId, text) => {
-	await bot.sendMessage(chatId, text
-		//.replace(/{first_name}/g, chat.first_name || '')
-		//.replace(/{last_name}/g, chat.last_name || '')
-	)
-}
+export const isMedia = msg => msg.document || msg.photo || msg.video || msg.location || msg.poll || msg.audio || msg.contact
+
+export const sendNameMessage = async ({ id, first_name, last_name }, text) => await bot.sendMessage(id, text
+	.replace(/{first_name}/g, first_name || '')
+	.replace(/{last_name}/g, last_name || '')
+)
 
 export const splitArray = (arr, subarraySize) => {
 	const resultArray = []
@@ -45,11 +45,12 @@ export const updateJsonFile = (property, value) => {
 	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }
 
-export const addSub = chatId => {
+export const addSub = ({ id, first_name, last_name }) => {
 	const data = JSON.parse(fs.readFileSync('tempdb.json', 'utf8'))
+	const newUser = { id, first_name, last_name }
 
-	!data.subs && (data.subs = [ chatId ])
-	!data.subs.includes(chatId) && data.subs.push(chatId)
+	!data.subs && (data.subs = [ newUser ])
+	!data.subs.find(user => user.id !== id) && data.subs.push(newUser)
 
 	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }
