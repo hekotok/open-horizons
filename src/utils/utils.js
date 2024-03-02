@@ -22,6 +22,13 @@ export const getUserMessage = async (chatId, needOnlyText, { question, answer, c
 	bot.on('message', handleUserMessage)
 })
 
+export const sendNameMessage = async (chatId, text) => {
+	await bot.sendMessage(chatId, text
+		//.replace(/{first_name}/g, chat.first_name || '')
+		//.replace(/{last_name}/g, chat.last_name || '')
+	)
+}
+
 export const splitArray = (arr, subarraySize) => {
 	const resultArray = []
 

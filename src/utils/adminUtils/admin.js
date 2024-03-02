@@ -3,7 +3,7 @@ import fs from 'fs'
 import { bot } from '../../config.js'
 import { editEventName, editReminders, editEventDate } from './editEvents.js'
 import { delayDate, getDate, getTime, parseDateTime } from './time.js'
-import { getUserMessage, splitArray, updateJsonFile } from '../utils.js'
+import { getUserMessage, sendNameMessage, splitArray, updateJsonFile } from '../utils.js'
 
 export const adminIds = [ 484526571, 1242013874, 249185126, 759055434, 1451006514 ]
 export let events = []
@@ -41,10 +41,20 @@ export const sendMessage = async ({ chat }) => {
 		})
 
 		if (data === 'all')
-			JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs.forEach(userId => bot.copyMessage(userId, chat.id, msg.message_id))
+			JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).subs.forEach(userId => {
+				if (msg.document || msg.photo || msg.video || msg.location || msg.poll || msg.audio || msg.contact)
+					bot.copyMessage(userId, chat.id, msg.message_id)
+				else
+					sendNameMessage(msg)
+			})
 		else
 			events.find(event => event.text === data).subs
-				.forEach(userId => bot.copyMessage(userId, chat.id, msg.message_id))
+				.forEach(userId => {
+					if (msg.document || msg.photo || msg.video || msg.location || msg.poll || msg.audio || msg.contact)
+						bot.copyMessage(userId, chat.id, msg.message_id)
+					else
+						sendNameMessage(userId, msg.text)
+				})
 
 		await bot.sendMessage(chat.id, 'Сообщение отправлено')
 
