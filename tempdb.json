@@ -1,5 +1,43 @@
 {
-  "events": [],
+  "events": [
+    {
+      "text": "ert",
+      "description": {
+        "chatId": 484526571,
+        "messageId": 5207
+      },
+      "date": "2024-03-13T10:00:00.000Z",
+      "callback_data": "ert",
+      "subs": [
+        484526571
+      ],
+      "reminders": []
+    },
+    {
+      "text": "cv",
+      "description": {
+        "chatId": 484526571,
+        "messageId": 5269
+      },
+      "date": "2024-03-20T10:00:00.000Z",
+      "callback_data": "cv",
+      "subs": [],
+      "reminders": []
+    },
+    {
+      "text": "gtrf",
+      "description": {
+        "chatId": 484526571,
+        "messageId": 5278
+      },
+      "date": "2024-03-24T10:00:00.000Z",
+      "callback_data": "gtrf",
+      "subs": [
+        484526571
+      ],
+      "reminders": []
+    }
+  ],
   "subs": [
     {
       "id": 484526571,

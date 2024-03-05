@@ -9,8 +9,6 @@ import {
 	deleteEventCommand,
 	editEvent,
 	adminIds,
-	initEvents,
-	initAdmins,
 	editHelloText,
 	sendMessage,
 	addAdmin
@@ -40,9 +38,6 @@ const start = async ({ chat, from: user }) => {
 }
 
 const init = () => {
-	initEvents()
-	initAdmins()
-
 	bot.onText(/\/start/, start)
 	bot.onText(/\/inewadmin/, addAdmin)
 

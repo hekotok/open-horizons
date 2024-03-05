@@ -11,11 +11,8 @@ import {
 	updateJsonFile
 } from '../utils.js'
 
-export let adminIds = []
-export let events = []
-
-export const initEvents = () => events = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).events || []
-export const initAdmins = () => adminIds = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).adminIds || []
+export const adminIds = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).adminIds || []
+export let events = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).events || []
 
 export const editHelloText = async ({ chat }) => {
 	const helloText = await getUserMessage(chat.id, true, {
@@ -32,10 +29,10 @@ export const addAdmin = async ({ chat }) => {
 		adminIds.push(chat.id)
 		updateJsonFile('adminIds', adminIds)
 
-		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ')
+		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ\nЕсли кнопки администратора не появились, перезапустите телеграм')
 	}
 	else
-		await bot.sendMessage(chat.id, 'Ну ты чего, ты же уже админ')
+		await bot.sendMessage(chat.id, 'Ну ты чего, ты же уже админ\nЕсли кнопки администратора не появились, перезапустите телеграм')
 }
 
 export const sendMessage = async ({ chat }) => {
@@ -115,7 +112,14 @@ export const addEvent = async ({ chat }) => {
 
 	await bot.sendMessage(chat.id, `Мероприятие ${text} запланировано на ${date} ${time}`)
 
-	events.push({ text, description, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
+	events.push({
+		text,
+		description: { chatId: description.chat.id, messageId: description.message_id },
+		date: parseDateTime(date, time),
+		callback_data: text,
+		subs: [],
+		reminders: []
+	})
 	setTimeout(() => events.at(-1).subs = [], delayDate(events.at(-1).date))
 
 	updateJsonFile('events', events)
