@@ -5,6 +5,7 @@
       "date": "2024-03-29T10:00:00.000Z",
       "callback_data": "h",
       "subs": [
+        2088118088,
         484526571
       ],
       "reminders": [
@@ -24,7 +25,12 @@
       "id": 484526571,
       "first_name": "Daniil",
       "last_name": "Zheleznyakov"
+    },
+    {
+      "id": 2088118088,
+      "first_name": "Екатерина",
+      "last_name": "Морозова"
     }
   ],
-  "helloText": "Добавить мероприятие"
+  "helloText": "Будь как дома, путник"
 }

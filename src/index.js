@@ -28,7 +28,7 @@ const start = async ({ chat, from: user }) => {
 
 	bot.setMyCommands([
 		{ command: 'myevents', description: 'Мои мероприятия' },
-		{ command: 'subscribe', description: 'Подписаться на новое мероприятие' }
+		{ command: 'subscribe', description: 'А что ещё интересного будет?' }
 	])
 
 	addSub(user)

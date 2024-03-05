@@ -12,7 +12,7 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 		updatingEvent.subs.push(chatId)
 		updateJsonFile('events', events)
 
-		await bot.sendMessage(chatId, `Вы подписались на мероприятие ${data}`)
+		await bot.sendMessage(chatId, `Спасибо, что Вы зарегистрировались на ${data}\nПожалуйста, запишите себе в календарь, чтобы не пропустить.\nМы пришлем Вам ссылку на вход незадолго до мероприятия🧧`)
 	}
 }
 
@@ -22,7 +22,7 @@ export const chooseEvent = async chatId => new Promise(() => {
 	else if (events.length > 1) {
 		const { message_id } = bot.sendMessage(
 			chatId,
-			'Выберите мероприятие',
+			'Мы сами ждём не дождёмся и Вы присоединяйтесь!',
 			{ reply_markup: { inline_keyboard: splitArray(events, 3) } }
 		)
 
@@ -35,7 +35,7 @@ export const chooseEvent = async chatId => new Promise(() => {
 		bot.on('callback_query', handleCallbackQuery)
 	}
 	else {
-		bot.sendMessage(chatId, 'Сейчас не запланировано никаких мероприятий')
+		bot.sendMessage(chatId, 'Ой-ой, мы готовим новые блюда на нашей интеллектуальной кухне. Но пока ещё не готово. Мы скоро Вас позовем👌🛋️🍹')
 
 		return
 	}
@@ -46,21 +46,24 @@ export const getUserEvents = async ({ chat }) => {
 		.filter(event => event.subs.includes(chat.id) && delayDate(new Date(event.date)) >= 0)
 		.map(event => `На ${event.date.split`T`[0]} запланировано ${event.text}`).join`\n`
 
-	await bot.sendMessage(chat.id, userEvents.length ? userEvents : 'У вас нет запланированных мероприятий')
+	await bot.sendMessage(chat.id, userEvents.length
+		? `Вы решили прийти к нам эти мероприятия, мы Вас очень ждём❤️\n${userEvents}`
+		: 'Ой, так Вы никуда не записались. Выбирайте скорее по соседей кнопке. У нас познавательно 🇪🇺🇺🇸🇬🇧🇵🇹🇮🇱🇲🇪🇮🇩🇨🇭🇨🇾🇰🇿🇬🇪 и душевно✨📖👇'
+	)
 }
 
 export const getOtherEvents = async ({ chat }) => {
 	if (!events.length)
-		return await bot.sendMessage(chat.id, 'В ближайшее время не планируется никаких мероприятий')
+		return await bot.sendMessage(chat.id, 'Ой-ой, мы готовим новые блюда на нашей интеллектуальной кухне. Но пока ещё не готово. Мы скоро Вас позовем👌🛋️🍹')
 
 	const otherEvents = events.filter(event => !event.subs.includes(chat.id))
 
 	if (!otherEvents.length)
-		return await bot.sendMessage(chat.id, 'Вы уже подписаны на все возможные мероприятия')
+		return await bot.sendMessage(chat.id, 'Так-так, а Вы уже везде записались👌 גאפךא До скорой встречи в эфире🌳')
 
 	const { message_id } = await bot.sendMessage(
 		chat.id,
-		'Выберите мероприятие, на которое вы хотели бы подписаться',
+		'Мы сами ждём не дождёмся и Вы присоединяйтесь!🤗',
 		{ reply_markup: { inline_keyboard: splitArray(otherEvents, 3) } }
 	)
 

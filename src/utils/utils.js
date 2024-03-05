@@ -50,7 +50,7 @@ export const addSub = ({ id, first_name, last_name }) => {
 	const newUser = { id, first_name, last_name }
 
 	!data.subs && (data.subs = [ newUser ])
-	!data.subs.find(user => user.id !== id) && data.subs.push(newUser)
+	!data.subs.find(user => user.id === id) && data.subs.push(newUser)
 
 	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }
