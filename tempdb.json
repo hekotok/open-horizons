@@ -21,7 +21,9 @@
       },
       "date": "2024-03-20T10:00:00.000Z",
       "callback_data": "cv",
-      "subs": [],
+      "subs": [
+        484526571
+      ],
       "reminders": []
     },
     {

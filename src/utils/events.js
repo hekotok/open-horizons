@@ -20,15 +20,32 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 			if (chatId !== message.chat.id)
 				return
 
-			if (data === 'false')
-				return await bot.sendMessage(chatId, 'Очень жаль, но мы будем вас ждать')
-
 			bot.off('callback_query', handleSubAgree)
 
-			updatingEvent.subs.push(chatId)
-			updateJsonFile('events', events)
+			if (data === 'true') {
+				updatingEvent.subs.push(chatId)
+				updateJsonFile('events', events)
 
-			await bot.sendMessage(chatId, `Спасибо, что Вы зарегистрировались на ${data}\nПожалуйста, запишите себе в календарь, чтобы не пропустить.\nМы пришлем Вам ссылку на вход незадолго до мероприятия🧧`)
+				await bot.sendMessage(chatId, `Спасибо, что Вы зарегистрировались на ${data}\nПожалуйста, запишите себе в календарь, чтобы не пропустить.\nМы пришлем Вам ссылку на вход незадолго до мероприятия🧧`)
+			}
+
+			await bot.sendMessage(
+				chatId,
+				'Возможно вы желаете подписаться на другие мероприятия',
+				{ reply_markup: { inline_keyboard: [ [ { text: 'Конечно', callback_data: 'true' }, { text: 'Нет', callback_data: 'false' } ] ] } }
+			)
+
+			const handlePlusSub = async ({ data, message }) => {
+				if (chatId !== message.chat.id)
+					return
+				bot.off('callback_query', handleSubAgree)
+
+				if (data === 'true')
+					getOtherEvents({ chat })
+				else
+					await bot.sendMessage(chatId, 'Очень жаль, ждём вас в будущем')
+			}
+			bot.on('callback_query', handlePlusSub)
 		}
 		bot.on('callback_query', handleSubAgree)
 	}
