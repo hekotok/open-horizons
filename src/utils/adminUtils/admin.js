@@ -96,6 +96,14 @@ export const addEvent = async ({ chat }) => {
 		return
 	text = text.trim()
 
+	let description = await getUserMessage(chat.id, false, {
+		question: 'Добавьте описание к вашему мероприятию',
+		cancelMessage: 'Добавление мероприятия отменено'
+	})
+
+	if (!description)
+		return
+
 	const date = await getDate(chat.id)
 	const time = await getTime(chat.id, 'Введите время, в которое пройдет мероприятие\nНапример: 10:00')
 
@@ -107,7 +115,7 @@ export const addEvent = async ({ chat }) => {
 
 	await bot.sendMessage(chat.id, `Мероприятие ${text} запланировано на ${date} ${time}`)
 
-	events.push({ text, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
+	events.push({ text, description, date: parseDateTime(date, time), callback_data: text, subs: [], reminders: [] })
 	setTimeout(() => events.at(-1).subs = [], delayDate(events.at(-1).date))
 
 	updateJsonFile('events', events)
