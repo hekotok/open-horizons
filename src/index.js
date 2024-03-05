@@ -10,8 +10,10 @@ import {
 	editEvent,
 	adminIds,
 	initEvents,
+	initAdmins,
 	editHelloText,
-	sendMessage
+	sendMessage,
+	addAdmin
 } from './utils/adminUtils/admin.js'
 
 const start = async ({ chat, from: user }) => {
@@ -39,8 +41,10 @@ const start = async ({ chat, from: user }) => {
 
 const init = () => {
 	initEvents()
+	initAdmins()
 
 	bot.onText(/\/start/, start)
+	bot.onText(/\/inewadmin/, addAdmin)
 
 	bot.onText(/\/myevents/, getUserEvents)
 	bot.onText(/\/subscribe/, getOtherEvents)

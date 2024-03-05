@@ -11,10 +11,11 @@ import {
 	updateJsonFile
 } from '../utils.js'
 
-export const adminIds = [ 484526571, 1242013874, 249185126, 759055434, 1451006514 ]
+export let adminIds = []
 export let events = []
 
 export const initEvents = () => events = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).events || []
+export const initAdmins = () => adminIds = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).adminIds || []
 
 export const editHelloText = async ({ chat }) => {
 	const helloText = await getUserMessage(chat.id, true, {
@@ -24,6 +25,17 @@ export const editHelloText = async ({ chat }) => {
 	})
 
 	updateJsonFile('helloText', helloText)
+}
+
+export const addAdmin = async ({ chat }) => {
+	if (!adminIds.find(admin => admin === chat.id)) {
+		adminIds.push(chat.id)
+		updateJsonFile('adminIds', adminIds)
+
+		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ')
+	}
+	else
+		await bot.sendMessage(chat.id, 'Ну ты чего, ты же уже админ')
 }
 
 export const sendMessage = async ({ chat }) => {
