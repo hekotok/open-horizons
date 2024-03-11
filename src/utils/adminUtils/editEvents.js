@@ -27,33 +27,36 @@ export const editReminders = async (chatId, eventIdx) => {
 	)
 
 	const handleChooseReminder = async ({ data, message }) => {
-		if (message.chat.id === chatId) {
-			if (data === 'new')
-				createReminder(chatId, events[eventIdx].text)
-			else {
-				const reminderId = data
-				const { message_id } = await bot.sendMessage(
-					chatId,
-					'Желаете удалить это напоминание?',
-					{ reply_markup: { inline_keyboard: [
-						[ { text: 'Удалить напоминание', callback_data: 'del' } ],
-						[ { text: 'Не изменять напоминание', callback_data: 'cancel' } ]
-					] } }
-				)
+		if (message.chat.id !== chatId)
+			return
 
-				const handleEditReminder = async ({ data, message }) => {
-					if (message.chat.id !== chatId)
-						return
+		bot.off('callback_query', handleChooseReminder)
 
-					data === 'del' && deleteReminder(eventIdx, +reminderId)
+		if (data === 'new')
+			createReminder(chatId, events[eventIdx].text)
+		else {
+			const reminderId = data
+			const { message_id } = await bot.sendMessage(
+				chatId,
+				'Желаете удалить это напоминание?',
+				{ reply_markup: { inline_keyboard: [
+					[ { text: 'Удалить напоминание', callback_data: 'del' } ],
+					[ { text: 'Не изменять напоминание', callback_data: 'cancel' } ]
+				] } }
+			)
 
-					bot.deleteMessage(chatId, message_id)
-					bot.off('callback_query', handleEditReminder)
-				}
+			const handleEditReminder = async ({ data, message }) => {
+				if (message.chat.id !== chatId)
+					return
 
-				bot.on('callback_query', handleEditReminder)
+				bot.off('callback_query', handleEditReminder)
+
+				data === 'del' && deleteReminder(eventIdx, +reminderId)
+
+				bot.deleteMessage(chatId, message_id)
 			}
-			bot.off('callback_query', handleChooseReminder)
+
+			bot.on('callback_query', handleEditReminder)
 		}
 	}
 

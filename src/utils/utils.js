@@ -54,3 +54,12 @@ export const addSub = ({ id, first_name, last_name }) => {
 
 	fs.writeFileSync('tempdb.json', JSON.stringify(data, null, 2), 'utf8')
 }
+
+export const checkHandleMessage = text => text[0] === '/' || [
+	'Редактировать приветствие',
+	'Отправить сообщение',
+	'Добавить мероприятие',
+	'Удалить мероприятие',
+	'Редактировать мероприятие',
+	'Добавить напоминание'
+].includes(text)

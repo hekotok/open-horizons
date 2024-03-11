@@ -8,7 +8,8 @@ import {
 	isMedia,
 	sendNameMessage,
 	splitArray,
-	updateJsonFile
+	updateJsonFile,
+	checkHandleMessage
 } from '../utils.js'
 
 export const adminIds = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).adminIds || []
@@ -29,7 +30,7 @@ export const addAdmin = async ({ chat }) => {
 		adminIds.push(chat.id)
 		updateJsonFile('adminIds', adminIds)
 
-		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ\nЕсли кнопки администратора не появились, перезапустите телеграм')
+		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ\nЕсли кнопки администратора не появились, напишите /start и перезапустите телеграм')
 	}
 	else
 		await bot.sendMessage(chat.id, 'Ну ты чего, ты же уже админ\nЕсли кнопки администратора не появились, перезапустите телеграм')
@@ -49,11 +50,16 @@ export const sendMessage = async ({ chat }) => {
 		if (message.chat.id !== chat.id)
 			return
 
+		bot.off('callback_query', handleMessage)
+
 		const msg = await getUserMessage(chat.id, false, {
 			question: 'Введите сообщение, которое отправится пользователям',
 			answer: 'Сообщение отправляется',
 			cancelMessage: 'Отправка сообщения отменена'
 		})
+
+		if (checkHandleMessage(msg.text))
+			return
 
 		const { subs } = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8'))
 		if (data === 'all')
@@ -73,8 +79,6 @@ export const sendMessage = async ({ chat }) => {
 				})
 
 		await bot.sendMessage(chat.id, 'Сообщение отправлено')
-
-		bot.off('callback_query', handleMessage)
 	}
 
 	bot.on('callback_query', handleMessage)
@@ -151,6 +155,8 @@ export const deleteEventCommand = async ({ chat }) => {
 		if (message.chat.id !== chat.id)
 			return
 
+		bot.off('callback_query', handleCallbackQuery)
+
 		const deletingEventIdx = events.findIndex(event => event.text === data)
 
 		if (deletingEventIdx !== -1) {
@@ -159,7 +165,6 @@ export const deleteEventCommand = async ({ chat }) => {
 
 			await bot.sendMessage(chat.id, `Мероприятие ${data} удалено`)
 		}
-		bot.off('callback_query', handleCallbackQuery)
 	}
 
 	bot.on('callback_query', handleCallbackQuery)
@@ -182,6 +187,8 @@ export const editEvent = async ({ chat }) => {
 		if (message.chat.id !== chat.id)
 			return
 
+		bot.off('callback_query', handleEditingEvent)
+
 		const editingEventIdx = events.findIndex(event => event.text === data)
 		if (editingEventIdx === -1) {
 			await bot.sendMessage(chat.id, `Мероприятие ${data} не найдено`)
@@ -199,6 +206,8 @@ export const editEvent = async ({ chat }) => {
 
 		const handleEditType = async ({ data, message }) => {
 			if (message.chat.id === chat.id) {
+				bot.off('callback_query', handleEditType)
+
 				switch (data) {
 				case 'editname':
 					events[editingEventIdx].text = events[editingEventIdx].callback_data = await editEventName(chat.id) || events[editingEventIdx].text
@@ -212,11 +221,9 @@ export const editEvent = async ({ chat }) => {
 				}
 
 				updateJsonFile('events', events)
-				bot.off('callback_query', handleEditType)
 			}
 		}
 
-		bot.off('callback_query', handleEditingEvent)
 		bot.on('callback_query', handleEditType)
 	}
 

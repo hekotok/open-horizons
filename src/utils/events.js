@@ -3,9 +3,9 @@ import { splitArray, updateJsonFile } from './utils.js'
 import { events } from './adminUtils/admin.js'
 import { delayDate } from './adminUtils/time.js'
 
-const eventSubscribe = async (chatId, data, { chat }) => {
+const eventSubscribe = async (chatId, chosedEvent, { chat }) => {
 	if (chat.id === chatId || chat === -1) {
-		const updatingEvent = events.find(event => event.text === data)
+		const updatingEvent = events.find(event => event.text === chosedEvent)
 		if (!updatingEvent)
 			return
 
@@ -26,7 +26,7 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 				updatingEvent.subs.push(chatId)
 				updateJsonFile('events', events)
 
-				await bot.sendMessage(chatId, `Спасибо, что Вы зарегистрировались на ${data}\nПожалуйста, запишите себе в календарь, чтобы не пропустить.\nМы пришлем Вам ссылку на вход незадолго до мероприятия🧧`)
+				await bot.sendMessage(chatId, `Спасибо, что Вы зарегистрировались на ${chosedEvent}\nПожалуйста, запишите себе в календарь, чтобы не пропустить.\nМы пришлем Вам ссылку на вход незадолго до мероприятия🧧`)
 			}
 
 			await bot.sendMessage(
@@ -38,10 +38,10 @@ const eventSubscribe = async (chatId, data, { chat }) => {
 			const handlePlusSub = async ({ data, message }) => {
 				if (chatId !== message.chat.id)
 					return
-				bot.off('callback_query', handleSubAgree)
+				bot.off('callback_query', handlePlusSub)
 
 				if (data === 'true')
-					getOtherEvents({ chat })
+					getOtherEvents(chatId)
 				else
 					await bot.sendMessage(chatId, 'Очень жаль, ждём вас в будущем')
 			}
@@ -86,7 +86,7 @@ export const getUserEvents = async ({ chat }) => {
 	if (userEvents.length)
 		await bot.sendMessage(
 			chat.id,
-			'Вы решили прийти к нам эти мероприятия, мы Вас очень ждём❤️',
+			'Вы решили прийти к нам на эти мероприятия, мы Вас очень ждём❤️',
 			{ reply_markup: { inline_keyboard: splitArray(userEvents, 3) } }
 		)
 	else
@@ -99,37 +99,37 @@ export const getUserEvents = async ({ chat }) => {
 		bot.off('callback_query', handleInterestingEvent)
 
 		const { description } = userEvents.find(event => event.text === data)
-		bot.copyMessage(chat.id, description.chatId, description.messageId)
+		await bot.copyMessage(chat.id, description.chatId, description.messageId)
 	}
 	bot.on('callback_query', handleInterestingEvent)
 }
 
-export const getOtherEvents = async ({ chat }) => {
+export const getOtherEvents = async chatId => {
 	if (!events.length)
-		return await bot.sendMessage(chat.id, 'Ой-ой, мы готовим новые блюда на нашей интеллектуальной кухне. Но пока ещё не готово. Мы скоро Вас позовем👌🛋️🍹')
+		return await bot.sendMessage(chatId, 'Ой-ой, мы готовим новые блюда на нашей интеллектуальной кухне. Но пока ещё не готово. Мы скоро Вас позовем👌🛋️🍹')
 
-	const otherEvents = events.filter(event => !event.subs.includes(chat.id))
+	const otherEvents = events.filter(event => !event.subs.includes(chatId))
 
 	if (!otherEvents.length)
-		return await bot.sendMessage(chat.id, 'Так-так, а Вы уже везде записались👌. До скорой встречи в эфире🌳')
+		return await bot.sendMessage(chatId, 'Так-так, а Вы уже везде записались👌. До скорой встречи в эфире🌳')
 
 	if (events.length === 1)
-		eventSubscribe(chat.id, events[0].text, { chat: -1 })
+		eventSubscribe(chatId, events[0].text, { chat: -1 })
 	else {
 		const { message_id } = await bot.sendMessage(
-			chat.id,
+			chatId,
 			'Мы сами ждём не дождёмся и Вы присоединяйтесь!🤗',
 			{ reply_markup: { inline_keyboard: splitArray(otherEvents, 3) } }
 		)
 
 		const handleSubEvent = async ({ data, message }) => {
-			if (chat.id !== message.chat.id)
+			if (chatId !== message.chat.id)
 				return
 
 			bot.off('callback_query', handleSubEvent)
 
-			await bot.deleteMessage(chat.id, message_id)
-			eventSubscribe(chat.id, data, message)
+			await bot.deleteMessage(chatId, message_id)
+			eventSubscribe(chatId, data, message)
 		}
 		bot.on('callback_query', handleSubEvent)
 	}

@@ -42,7 +42,7 @@ const init = () => {
 	bot.onText(/\/inewadmin/, addAdmin)
 
 	bot.onText(/\/myevents/, getUserEvents)
-	bot.onText(/\/subscribe/, getOtherEvents)
+	bot.onText(/\/subscribe/, ({ chat }) => getOtherEvents(chat.id))
 
 	bot.onText(/Редактировать приветствие/, editHelloText)
 	bot.onText(/Отправить сообщение/, sendMessage)
