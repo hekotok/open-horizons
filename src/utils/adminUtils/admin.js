@@ -22,6 +22,9 @@ export const editHelloText = async ({ chat }) => {
 		cancelMessage: 'Обновление приветственного текста отменено'
 	})
 
+	if (checkHandleMessage(helloText))
+		return
+
 	updateJsonFile('helloText', helloText)
 }
 
@@ -58,7 +61,7 @@ export const sendMessage = async ({ chat }) => {
 			cancelMessage: 'Отправка сообщения отменена'
 		})
 
-		if (checkHandleMessage(msg.text))
+		if (!checkHandleMessage(msg.text))
 			return
 
 		const { subs } = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8'))
@@ -93,7 +96,7 @@ export const addEvent = async ({ chat }) => {
 		cancelMessage: 'Добавление мероприятия отменено'
 	})
 
-	if (!text)
+	if (!text || checkHandleMessage(text))
 		return
 	text = text.trim()
 
@@ -102,7 +105,7 @@ export const addEvent = async ({ chat }) => {
 		cancelMessage: 'Добавление мероприятия отменено'
 	})
 
-	if (!description)
+	if (!description || checkHandleMessage(description.text))
 		return
 
 	const date = await getDate(chat.id)
