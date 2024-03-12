@@ -15,6 +15,13 @@ import {
 export const adminIds = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).adminIds || []
 export let events = JSON.parse(fs.readFileSync('tempdb.json', 'utf-8')).events || []
 
+export const adminCommands = [
+	[ { text: 'Редактировать приветствие' }, { text: 'Отправить сообщение' } ],
+	[ { text: 'Добавить мероприятие' }, { text: 'Удалить мероприятие' } ],
+	[ { text: 'Редактировать мероприятие' } ],
+	[ { text: 'Добавить напоминание' } ]
+]
+
 export const editHelloText = async ({ chat }) => {
 	const helloText = await getUserMessage(chat.id, true, {
 		question: 'Введите текст приветствия.\nДля того чтобы обратиться к пользователю по имени напишите вместо имени {first_name}, для обращения по фамилии напишите вместо фамилии {last_name}',
@@ -33,7 +40,11 @@ export const addAdmin = async ({ chat }) => {
 		adminIds.push(chat.id)
 		updateJsonFile('adminIds', adminIds)
 
-		await bot.sendMessage(chat.id, 'Поздравляю, теперь ты админ\nЕсли кнопки администратора не появились, напишите /start и перезапустите телеграм')
+		await bot.sendMessage(
+			chat.id,
+			'Поздравляю, теперь ты админ\nЕсли кнопки администратора не появились, напишите /start и перезапустите телеграм',
+			{ reply_markup: { keyboard: adminCommands } }
+		)
 	}
 	else
 		await bot.sendMessage(chat.id, 'Ну ты чего, ты же уже админ\nЕсли кнопки администратора не появились, перезапустите телеграм')

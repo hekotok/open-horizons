@@ -11,20 +11,14 @@ import {
 	adminIds,
 	editHelloText,
 	sendMessage,
-	addAdmin
+	addAdmin,
+	adminCommands
 } from './utils/adminUtils/admin.js'
 
 const start = async ({ chat, from: user }) => {
 	const helloText = (JSON.parse(fs.readFileSync('tempdb.json', 'utf8')).helloText || 'Привет, {first_name}')
 		.replace(/{first_name}/g, chat.first_name || '')
 		.replace(/{last_name}/g, chat.last_name || '')
-
-	const adminCommands = [
-		[ { text: 'Редактировать приветствие' }, { text: 'Отправить сообщение' } ],
-		[ { text: 'Добавить мероприятие' }, { text: 'Удалить мероприятие' } ],
-		[ { text: 'Редактировать мероприятие' } ],
-		[ { text: 'Добавить напоминание' } ]
-	]
 
 	bot.setMyCommands([
 		{ command: 'myevents', description: 'Мои мероприятия' },
